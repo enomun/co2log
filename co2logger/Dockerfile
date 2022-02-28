@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM python:3.11.0a5-buster
 COPY requirements.txt .
 RUN pip install --user -r requirements.txt --extra-index-url https://www.piwheels.org/simple
 WORKDIR /app

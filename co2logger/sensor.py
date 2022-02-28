@@ -16,7 +16,7 @@ class CO2Reader:
         # Send command to 
         self.s.write(bytes([0xFF, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79]))
         # Read response
-        data = self.read(9)
+        data = self.s.read(9)
 
         # Is response length correct?
         if len(data) != 9:

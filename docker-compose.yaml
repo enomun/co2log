@@ -2,17 +2,17 @@ version: '3'
 
 services:
   co2plot:
-    build: ./co2log
+    build: ./co2logger
     image: co2logger
     volumes:
       - ./db:/db
     environment:
       TZ: Asia/Tokyo
     working_dir: /app
-    command: python plot_co2.py --dbpath /db/co2.db --outpath /db/restult.png
+    command: python plot_co2.py --interval 60 --dbpath /db/co2.db --outpath /db/result.png
 
   co2log:
-    build: ./co2log
+    build: ./co2logger
     image: co2logger
     volumes:
       - ./db:/db
@@ -20,6 +20,8 @@ services:
     environment:
       TZ: Asia/Tokyo
     working_dir: /app
-    command: python log_co2.py --debug --dbpath /db/co2.db
+    devices:
+      - "/dev/ttyS0:/dev/ttyS0"
+    command: python log_co2.py --interval 10 --dbpath /db/co2.db
 volumes:
   image:
