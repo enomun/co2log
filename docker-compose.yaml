@@ -6,22 +6,32 @@ services:
     image: co2logger
     volumes:
       - ./db:/db
+      - image:/image
     environment:
       TZ: Asia/Tokyo
     working_dir: /app
-    command: python plot_co2.py --interval 60 --dbpath /db/co2.db --outpath /db/result.png
+    command: python plot_co2.py --interval 60 --dbpath /db/co2.db --outpath /image/result.png
 
   co2log:
     build: ./co2logger
     image: co2logger
     volumes:
       - ./db:/db
-      - image:/image
     environment:
       TZ: Asia/Tokyo
     working_dir: /app
     devices:
       - "/dev/ttyS0:/dev/ttyS0"
-    command: python log_co2.py --interval 10 --dbpath /db/co2.db
+    command: python log_co2.py --interval 20 --dbpath /db/co2.db
+
+  web:
+    build: ./web
+    image: co2web
+    ports:
+      - 8000:8000
+    volumes:
+      - image:/web/images
+    working_dir: /web
+
 volumes:
   image:
