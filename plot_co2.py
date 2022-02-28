@@ -1,33 +1,23 @@
-from datetime import datetime
-import sqlite3
-import time
+#!/usr/bin/env python
 import sys
 import argparse
+import time
+from datetime import datetime
 
 from matplotlib import pyplot as plt
 import pandas as pd
+
+from database import DB
 
 def create_parser(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("--dbpath", default="./co2.db")
     parser.add_argument("--outpath", default="co2concentrations.png")
-    parser.add_argument("--interval", type=int,default=60)
-    parser.add_argument("--t", action="store_true")
-
+    parser.add_argument("--interval", type=int,default=0)
     args = parser.parse_args(argv[1:])
     return args
 
-def read_df_from_db(dbpath):
-    con = sqlite3.connect(dbpath)
-    cur = con.cursor()
-
-    sql = 'select * from co2'
-    df = pd.read_sql_query(sql, con)
-    con.close()
-    return df
-
-def update_figure(dbpath, outpath):
-    df = read_df_from_db(dbpath)
+def create_figure(df, outpath):
     times = [datetime.strptime(date.strip(), "%Y-%m-%d %H:%M:%S.%f") for date in df["date"]]
     
     now = datetime.now()
@@ -45,12 +35,20 @@ def update_figure(dbpath, outpath):
 
 def main(args):
     while True:
+        db = DB(args.dbpath)
         now = str(datetime.now())
-        update_figure(args.dbpath, args.outpath)
+        
+        sql = 'select * from co2'
+        df = pd.read_sql_query(sql, db.con)
+        db.close()
+
+        create_figure(df, args.outpath)
         print("figure updated: %s"%now)
+
+        if args.interval <=0:
+            break
         time.sleep(args.interval)
 
 if __name__ == "__main__":
     args = create_parser(sys.argv)
-    print(args)
     main(args)
