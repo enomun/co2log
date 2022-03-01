@@ -1,12 +1,19 @@
-version: '3'
+version: '3.2'
 
 services:
   co2plot:
     build: ./co2logger
     image: co2logger
     volumes:
-      - ./db:/db
-      - image:/image
+      - type: bind
+        source: "./db"
+        target: "/db"
+      - type: volume
+        source: "image"
+        target: "/image"
+      - type: bind
+        source: "./co2logger"
+        target: "/app"
     environment:
       TZ: Asia/Tokyo
     working_dir: /app
@@ -16,7 +23,12 @@ services:
     build: ./co2logger
     image: co2logger
     volumes:
-      - ./db:/db
+      - type: bind
+        source: "./db"
+        target: "/db"
+      - type: bind
+        source: "./co2logger"
+        target: "/app"
     environment:
       TZ: Asia/Tokyo
     working_dir: /app
@@ -30,7 +42,12 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - image:/web/images
+      - type: bind
+        source: "./web"
+        target: "/web"
+      - type: volume
+        source: "image"
+        target: "/web/images"
     working_dir: /web
 
 volumes:
