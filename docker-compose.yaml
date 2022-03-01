@@ -51,9 +51,11 @@ services:
     working_dir: /web
 
   metabase:
-    image: metabase/metabase
+    image: seannguyen/metabase:v0.31.2-arm
     ports:
       - 3000:3000
+    environment:
+      TZ: Asia/Tokyo
     volumes:
       - type: bind
         source: "./db"
