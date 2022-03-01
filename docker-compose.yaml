@@ -50,5 +50,13 @@ services:
         target: "/web/images"
     working_dir: /web
 
+  metabase:
+    image: metabase/metabase
+    ports:
+      - 3000:3000
+    volumes:
+      - type: bind
+        source: "./db"
+        target: "/db"
 volumes:
   image:

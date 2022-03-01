@@ -1,0 +1,14 @@
+version: '3.2'
+
+services:
+  co2plot:
+    command: python plot_co2.py --interval 0 --dbpath /db/co2.db --outpath /image/result.png
+
+  co2log:
+    devices:
+      - "/dev/ttyS0:/dev/ttyS0"
+    command: python log_co2.py --debug --interval 20 --dbpath /db/co2.db
+  web2:
+    environment:
+      - "MB_DB_FILE="
+      - "MB_DB_TYPE="
