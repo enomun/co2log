@@ -19,19 +19,26 @@ def create_parser(argv):
 
 def create_figure(df, outpath):
     times = [datetime.strptime(date.strip(), "%Y-%m-%d %H:%M:%S.%f") for date in df["date"]]
-    
+    threshold = 1000
+
     now = datetime.now()
     now = now.strftime("%Y-%m-%d %H:%M:%S")
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.plot(times,df["co2"])
+    ax.set_ylim([300,1500])
+
+    ax.plot([times[0],times[-1]],[threshold,threshold], "k--")
+
     plt.xticks(rotation=50)
 
     #ax.text(times[0],800,"Last updated:\n %s"%now)
     fig.suptitle("Last updated:\n %s"%now)
     fig.tight_layout()
     fig.savefig(outpath)
+    fig.clf()
+    plt.close(fig)
 
 def main(args):
     while True:
