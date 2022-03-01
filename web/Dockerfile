@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM python:3.11.0a5-buster
 WORKDIR /web
 COPY ./ /web
 CMD bash cgi.bash
