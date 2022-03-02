@@ -27,9 +27,11 @@ def create_figure(df, outpath):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.plot(times,df["co2"])
-    ax.set_ylim([300,1500])
+    ax.set_ylim([300,1200])
 
     ax.plot([times[0],times[-1]],[threshold,threshold], "k--")
+    ax.grid(which="major", axis="y", color = "k", alpha=0.2)
+    ax.tick_params(left=True, right =True, labelleft=True, labelright=True)
 
     plt.xticks(rotation=50)
 
