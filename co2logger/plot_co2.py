@@ -23,11 +23,12 @@ def create_figure(df, outpath):
 
     now = datetime.now()
     now = now.strftime("%Y-%m-%d %H:%M:%S")
+    co2now = df["co2"].iloc[-1]
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.plot(times,df["co2"])
-    ax.set_ylim([300,1200])
+    ax.set_ylim([350,1150])
 
     ax.plot([times[0],times[-1]],[threshold,threshold], "k--")
     ax.grid(which="major", axis="y", color = "k", alpha=0.2)
@@ -36,7 +37,7 @@ def create_figure(df, outpath):
     plt.xticks(rotation=50)
 
     #ax.text(times[0],800,"Last updated:\n %s"%now)
-    fig.suptitle("Last updated:\n %s"%now)
+    fig.suptitle("CO2 concentration: %d\nLast updated: %s"%(co2now,now))
     fig.tight_layout()
     fig.savefig(outpath)
     fig.clf()
@@ -52,6 +53,13 @@ def main(args):
         db.close()
 
         create_figure(df, args.outpath)
+        spl = args.outpath.split(".")
+        print(spl)
+        outpath2 = ".".join([spl[0]+"2",spl[1]])
+        print(outpath2)
+        
+        create_figure(df.iloc[-600:], outpath2)
+        
         print("figure updated: %s"%now)
 
         if args.interval <=0:
