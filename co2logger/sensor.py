@@ -1,5 +1,5 @@
 import serial
-
+import random
 class CO2Reader:
     """
     for MH-Z14
@@ -41,5 +41,6 @@ class CO2Reader:
         return data[2] * 256 + data[3]
 
     def read_dummy(self):
-        return 1000
+        default = 400
+        return default + random.random() * 50
 
