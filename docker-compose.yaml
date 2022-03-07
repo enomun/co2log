@@ -8,8 +8,8 @@ services:
       - type: bind
         source: "./db"
         target: "/db"
-      - type: volume
-        source: "image"
+      - type: bind
+        source: "./web/images"
         target: "/image"
       - type: bind
         source: "./co2logger"
@@ -45,10 +45,4 @@ services:
       - type: bind
         source: "./web"
         target: "/web"
-      - type: volume
-        source: "image"
-        target: "/web/images"
     working_dir: /web
-
-volumes:
-  image:

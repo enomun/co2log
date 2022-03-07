@@ -2,24 +2,14 @@ version: '3.2'
 
 services:
   co2plot:
-    command: python plot_co2.py --interval 10 --dbpath /db/co2.db --outpath /image/result.png
-
-  debugplot:
-    build: ./co2logger
-    image: co2logger
-    volumes:
-      - type: bind
-        source: "./db"
-        target: "/db"
-      - type: bind
-        source: "./co2logger"
-        target: "/app"
-    environment:
-      TZ: Asia/Tokyo
-    working_dir: /app
-    command: python plot_co2.py --interval 0 --dbpath /db/co2.db --outpath debug/co2concentrations-debug.png
+    command: python plot_co2.py --interval 10 --dbpath /db/co2_debug.db --outpath /image/result.png
 
   co2log:
+    volumes:
+      - type: bind
+        source: "."
+        target: "/app"
+    working_dir: /app/co2logger
     devices:
       - "/dev/ttyS0:/dev/ttyS0"
-    command: python log_co2.py --debug --interval 5 --dbpath /db/co2.db
+    command: python log_co2.py --debug --interval 5 --dbpath /db/co2_debug.db

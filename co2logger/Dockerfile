@@ -1,8 +1,6 @@
 FROM python:3.11.0a5-buster
 COPY requirements.txt .
-RUN pip install -r requirements.txt --extra-index-url https://www.piwheels.org/simple
-WORKDIR /app
-COPY ./ /app
+RUN pip install -r requirements.txt
 CMD python plot_co2.py
 
 ARG UID=1000
