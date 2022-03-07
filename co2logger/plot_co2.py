@@ -22,6 +22,55 @@ def create_parser(argv):
     return args
 
 
+def predict(xs, co2, now):
+    time_fit_minute = 5
+    time_pred_minute = 20
+
+    time_fit = time_fit_minute / (60 * 24)
+    time_pred = time_pred_minute / (60 * 24)
+    num_pred = len(xs[xs > xs[-1] - time_fit])
+
+    xs = xs[-num_pred:]
+    ys = co2[-num_pred:]
+
+    xs_pred = np.asarray([xs[0], now + time_pred])
+    coef1 = np.polyfit(xs, ys, 1)
+    ys_pred = coef1[0] * xs_pred + coef1[1]
+    return xs_pred, ys_pred
+
+
+def add_prediction(ax, times, co2, now):
+    num_check = 1000
+    xs = np.asarray([date2num(t) for t in times[-num_check:]])
+
+    # plot prediction
+    xs_pred, ys_pred = predict(xs, co2, now)
+    ax.plot(xs_pred, ys_pred, linestyle="dotted")
+    text = num2date(xs_pred[-1]).strftime("%H:%M")
+    ax.scatter([xs_pred[-1]], [ys_pred[-1]], color="r")
+    ax.text(xs_pred[-1] - 10 / 60 / 24, ys_pred[-1] + 30,
+            "%.1f\n@%s" % (ys_pred[-1], text))
+
+    # adjust xlim
+    xmin = now - 3 / 24
+    xmax = now + 0.7 / 24
+    ax.set_xlim([xmin, xmax])
+
+    # adjust ylim
+    idx_xmin = len(xs[xs > xmin])
+    ys = co2[-idx_xmin:]
+
+    ymin = min(ys.min(), ys_pred.min())
+    ymax = max(ys.max(), ys_pred.max())
+
+    ystep_approx = (ymax - ymin) / 6
+    ymax = ymin + 7 * ystep_approx
+
+    ymin = min(ymin, 350)
+    ymax = max(ymax, 1150)
+    ax.set_ylim([ymin, ymax])
+
+
 def create_figure(times, co2, outpath, enlarged=False):
     threshold = 1000
 
@@ -29,6 +78,7 @@ def create_figure(times, co2, outpath, enlarged=False):
     datenow = datetime.now()
     now = datenow.strftime("%Y-%m-%d %H:%M:%S")
 
+    # comon settings
     fig = plt.figure()
     fig.suptitle("CO2 concentration: %d\nLast updated: %s" % (co2now, now))
     ax = fig.add_subplot(111)
@@ -46,59 +96,46 @@ def create_figure(times, co2, outpath, enlarged=False):
     ax.plot([tmin, tmax], [threshold, threshold], "k--")
     ax.set_xlim(xlim)
 
-    if enlarged:
-        # fit data
-        num_pred = 100
-        xs = np.asarray([date2num(t) for t in times[-num_pred:]])
-        ys = co2[-num_pred:]
-        coef1 = np.polyfit(xs, ys, 1)
-
-        # add prediction
-        time_pred = 20 / 60 / 24
-        now = date2num(datenow)
-
-        xs_plot = np.asarray([xs[0], now + time_pred])
-        ys_plot = coef1[0] * xs_plot + coef1[1]
-        ax.plot(xs_plot, ys_plot, linestyle="dotted")
-
-        text = num2date(xs_plot[-1]).strftime("%H:%M")
-        ax.scatter([xs_plot[-1]], [ys_plot[-1]], color="r")
-        ax.text(xs_plot[-1] - 10 / 60 / 24, ys_plot[-1] + 30,
-                "%.1f\n@%s" % (ys_plot[-1], text))
-
-        ax.set_xlim([now - 3 / 24, now + 0.7 / 24])
-
     ymin, ymax = ax.get_ylim()
     ymin = min(ymin, 350)
     ymax = min(max(ymax, 1150), 1500)
     ax.set_ylim([ymin, ymax])
+
+    if enlarged:
+        now = date2num(datenow)
+        add_prediction(ax, times, co2, now)
 
     fig.tight_layout()
     fig.savefig(outpath)
     fig.clf()
     plt.close(fig)
 
+
+def read_data(args):
+    sql = 'select * from co2'
+
+    db = DB(args.dbpath)
+    df = pd.read_sql_query(sql, db.con)
+    db.close()
+
+    times = [
+        datetime.strptime(date.strip(), "%Y-%m-%d %H:%M:%S.%f")
+        for date in df["date"]
+    ]
+    co2 = df["co2"].values
+
+    return times, co2
+
+
 def main(args):
     while True:
-        db = DB(args.dbpath)
         now = str(datetime.now())
+        times, co2 = read_data(args)
 
-        sql = 'select * from co2'
-        df = pd.read_sql_query(sql, db.con)
-        db.close()
-
-        times = [
-            datetime.strptime(date.strip(), "%Y-%m-%d %H:%M:%S.%f")
-            for date in df["date"]
-        ]
-        co2 = df["co2"].values
-
+        # create figures
         create_figure(times, co2, args.outpath)
         spl = args.outpath.split(".")
-        print(spl)
         outpath2 = ".".join([spl[0] + "2", spl[1]])
-        print(outpath2)
-
         create_figure(times, co2, outpath2, enlarged="True")
 
         print("figure updated: %s" % now)
