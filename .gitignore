@@ -5,3 +5,4 @@ co2logger/debug/
 .env
 .devcontainer/
 metabase/*.db
+*.png
