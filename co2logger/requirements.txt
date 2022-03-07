@@ -1,3 +1,5 @@
 pyserial
 matplotlib
 pandas
+yapf
+flake8
