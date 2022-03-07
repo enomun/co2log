@@ -2,6 +2,7 @@
 import sys
 import argparse
 import time
+from pathlib import Path
 from datetime import datetime
 
 import numpy as np
@@ -15,7 +16,7 @@ from database import DB
 def create_parser(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("--dbpath", default="/db/co2.db")
-    parser.add_argument("--outpath", default="co2concentrations.png")
+    parser.add_argument("--outpath", default="./debug/co2concentrations.png")
     parser.add_argument("--interval", type=int, default=0)
     args = parser.parse_args(argv[1:])
 
@@ -141,8 +142,8 @@ def main(args):
 
         # create figures
         create_figure(times, co2, args.outpath)
-        spl = args.outpath.split(".")
-        outpath2 = ".".join([spl[0] + "2", spl[1]])
+        p = Path(args.outpath)
+        outpath2 = p.parent / (p.stem + "2" + p.suffix)
         create_figure(times, co2, outpath2, enlarged="True")
 
         print("figure updated: %s" % now)
