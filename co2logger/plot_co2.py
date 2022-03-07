@@ -48,8 +48,10 @@ def add_prediction(ax, times, co2, now):
     ax.plot(xs_pred, ys_pred, linestyle="dotted")
     text = num2date(xs_pred[-1]).strftime("%H:%M")
     ax.scatter([xs_pred[-1]], [ys_pred[-1]], color="r")
-    ax.text(xs_pred[-1] - 10 / 60 / 24, ys_pred[-1] + 30,
-            "%.1f\n@%s" % (ys_pred[-1], text))
+
+    if ys_pred[-1] > 300:
+        ax.text(xs_pred[-1] - 10 / 60 / 24, ys_pred[-1] + 30,
+                "%.1f\n@%s" % (ys_pred[-1], text))
 
     # adjust xlim
     xmin = now - 3 / 24
@@ -64,7 +66,12 @@ def add_prediction(ax, times, co2, now):
     ymax = max(ys.max(), ys_pred.max())
 
     ystep_approx = (ymax - ymin) / 6
-    ymax = ymin + 7 * ystep_approx
+
+    if ys_pred[-1] > ys.max():  # increasing
+        ymax = ymin + 7 * ystep_approx
+    else:
+        ymin = ymax - 7 * ystep_approx
+        ymin = max(ymin, 350)
 
     ymin = min(ymin, 350)
     ymax = max(ymax, 1150)
