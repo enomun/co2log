@@ -12,6 +12,12 @@ class CO2Reader:
             self.read = self.read_dummy
 
     
+    def calibrate(self):
+        print("sending calibration command")
+        self.s.write(bytes([0xFF, 0x01, 0x87, 0x00, 0x00, 0x00, 0x00, 0x00, 0x78]))
+        print("CO2 concentration after calibration: ", self.read_co2())
+
+
     def read_co2(self):
         # Send command to 
         self.s.write(bytes([0xFF, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79]))
