@@ -7,9 +7,16 @@ services:
   co2log:
     volumes:
       - type: bind
+        source: "~/.ssh"
+        target: "/home/docker/.ssh"
+      - type: bind
         source: "."
         target: "/app"
     working_dir: /app/co2logger
     devices:
       - "/dev/ttyS0:/dev/ttyS0"
     command: python log_co2.py --debug --interval 5 --dbpath /db/co2_debug.db
+  web:
+    ports:
+      - 8080:8000
+  
