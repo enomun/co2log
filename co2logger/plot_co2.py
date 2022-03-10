@@ -42,21 +42,28 @@ def predict(xs, co2, now):
 
 def add_prediction(ax, times, co2, now):
     num_check = 1000
+    xoff = 0.1 / 60 / 24
+    yoff = 10
+
     xs = np.asarray([date2num(t) for t in times[-num_check:]])
+    ys = co2
 
     # plot prediction
-    xs_pred, ys_pred = predict(xs, co2, now)
-    ax.plot(xs_pred, ys_pred, linestyle="dotted")
-    text = num2date(xs_pred[-1]).strftime("%H:%M")
-    ax.scatter([xs_pred[-1]], [ys_pred[-1]], color="r")
+    xs_pred, ys_pred = predict(xs, ys, now)
 
+    ax.plot(xs_pred, ys_pred, linestyle="dotted")
+    ax.scatter([xs_pred[-1]], [ys_pred[-1]], color="r")
     if ys_pred[-1] > 300:
-        ax.text(xs_pred[-1] - 10 / 60 / 24, ys_pred[-1] + 30,
-                "%.1f\n@%s" % (ys_pred[-1], text))
+        text = "%.1f\n@%s" % (ys_pred[-1], num2date(xs_pred[-1]).strftime("%H:%M"))
+        ax.text(xs_pred[-1] + xoff, ys_pred[-1] + yoff, text, ha="left", va="bottom")
+
+    ax.scatter([xs[-1]], [ys[-1]], color="r")
+    text = "%.1f" % (ys[-1])
+    ax.text(xs[-1] + xoff, ys[-1] + yoff, text, ha="left", va="bottom")
 
     # adjust xlim
     xmin = now - 3 / 24
-    xmax = now + 0.7 / 24
+    xmax = now + 0.75 / 24
     ax.set_xlim([xmin, xmax])
 
     # adjust ylim
@@ -88,10 +95,12 @@ def create_figure(times, co2, outpath, enlarged=False):
 
     # comon settings
     fig = plt.figure()
-    fig.suptitle("CO2 concentration: %d\nLast updated: %s" % (co2now, now))
+    fig.suptitle("Last updated: %s" % (now))
     ax = fig.add_subplot(111)
     ax.grid(which="major", axis="y", color="k", alpha=0.2)
     ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
+    ax.set_ylabel(r"$\mathrm{CO}_2$ concentration [ppm]")
+
     plt.xticks(rotation=50)
 
     # main plot
@@ -126,10 +135,7 @@ def read_data(args):
     df = pd.read_sql_query(sql, db.con)
     db.close()
 
-    times = [
-        datetime.strptime(date.strip(), "%Y-%m-%d %H:%M:%S.%f")
-        for date in df["date"]
-    ]
+    times = [datetime.strptime(date.strip(), "%Y-%m-%d %H:%M:%S.%f") for date in df["date"]]
     co2 = df["co2"].values
 
     return times, co2
