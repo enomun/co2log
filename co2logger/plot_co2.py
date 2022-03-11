@@ -51,13 +51,15 @@ def add_prediction(ax, times, co2, now):
     # plot prediction
     xs_pred, ys_pred = predict(xs, ys, now)
 
+    # add info about prediction
     ax.plot(xs_pred, ys_pred, linestyle="dotted")
     ax.scatter([xs_pred[-1]], [ys_pred[-1]], color="r")
     if ys_pred[-1] > 300:
         text = "%.1f\n@%s" % (ys_pred[-1], num2date(xs_pred[-1]).strftime("%H:%M"))
         ax.text(xs_pred[-1] + xoff, ys_pred[-1] + yoff, text, ha="left", va="bottom")
 
-    ax.scatter([xs[-1]], [ys[-1]], color="r")
+    # add info about now
+    ax.scatter([xs[-1]], [ys[-1]], color="r", zorder=10)
     text = "%.1f" % (ys[-1])
     ax.text(xs[-1] + xoff, ys[-1] + yoff, text, ha="left", va="bottom")
 
