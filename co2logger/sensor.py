@@ -8,6 +8,7 @@ class CO2Reader:
     """
 
     def __init__(self, device, debug=False):
+        print("initializing CO2 reader")
         if not debug:
             self.s = serial.Serial(device, baudrate=9600, timeout=0.1)
             self.stop_auto_calibration()
@@ -29,6 +30,7 @@ class CO2Reader:
         print("CO2 concentration after calibration: ", self.read_co2())
 
     def read_co2(self):
+        print("Reading sensor information")
         # Send command to
         self.s.write(bytes([0xFF, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79]))
         # Read response
