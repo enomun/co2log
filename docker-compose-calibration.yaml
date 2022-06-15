@@ -1,0 +1,48 @@
+version: '3.2'
+
+services:
+  co2plot:
+    build: ./co2logger
+    image: co2logger
+    volumes:
+      - type: bind
+        source: "./db"
+        target: "/db"
+      - type: bind
+        source: "./web/images"
+        target: "/image"
+      - type: bind
+        source: "./co2logger"
+        target: "/app"
+    environment:
+      TZ: Asia/Tokyo
+    working_dir: /app
+    command: python plot_co2.py --interval 60 --dbpath /db/co2.db --outpath /image/result.png
+
+  co2log:
+    build: ./co2logger
+    image: co2logger
+    volumes:
+      - type: bind
+        source: "./db"
+        target: "/db"
+      - type: bind
+        source: "./co2logger"
+        target: "/app"
+    environment:
+      TZ: Asia/Tokyo
+    working_dir: /app
+    devices:
+      - "/dev/ttyS0:/dev/ttyS0"
+    command: python log_co2.py --interval 20 --dbpath /db/co2.db  --calibrate
+
+  web:
+    build: ./web
+    image: co2web
+    ports:
+      - 8000:8000
+    volumes:
+      - type: bind
+        source: "./web"
+        target: "/web"
+    working_dir: /web
