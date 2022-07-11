@@ -12,7 +12,6 @@ import pandas as pd
 
 from database import DB
 
-
 def create_parser(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("--dbpath", default="/db/co2.db")
@@ -137,7 +136,7 @@ def read_data(args):
     df = pd.read_sql_query(sql, db.con)
     db.close()
 
-    times = [datetime.strptime(date.strip(), "%Y-%m-%d %H:%M:%S.%f") for date in df["date"]]
+    times = [datetime.strptime(date.strip().split(".")[0], "%Y-%m-%d %H:%M:%S") for date in df["date"]]
     co2 = df["co2"].values
 
     return times, co2
@@ -146,6 +145,7 @@ def read_data(args):
 def main(args):
     while True:
         now = str(datetime.now())
+        print("co2plot",now)
         times, co2 = read_data(args)
 
         # create figures
