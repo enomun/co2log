@@ -66,7 +66,7 @@ def add_prediction(ax, times, co2, now):
         ymin = ymax - 7 * ystep_approx
         ymin = max(ymin, 350)
 
-    ymin = min(ymin, 350)
+    ymin = min(ymin, 200)
     ymax = max(ymax, 1150)
     ax.set_ylim([ymin, ymax])
 
