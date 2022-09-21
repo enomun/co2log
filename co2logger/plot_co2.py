@@ -3,7 +3,7 @@ import sys
 import argparse
 import time
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from database import DB
 from lib import plot
@@ -32,9 +32,13 @@ def read_data(dbpath, sql='select * from co2'):
 
 def main(args):
     while True:
-        now = str(datetime.now())
-        print("co2plot", now)
-        times, co2 = read_data(args.dbpath)
+        # set sql conditions
+        now = datetime.now()
+        cnd = (now - timedelta(days=100)).date()
+        sql = f"select * from co2 where date > '{cnd}'"
+
+        # read data
+        times, co2 = read_data(args.dbpath, sql)
 
         # create figures
         plot.create_figure(times, co2, args.outpath)
