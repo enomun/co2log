@@ -31,9 +31,11 @@ services:
         target: "/app"
     environment:
       TZ: Asia/Tokyo
+      PYTHONUNBUFFERED: 1
     working_dir: /app
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
+      - "/dev/gpiomem:/dev/gpiomem"
     command: python display_co2.py --interval 5 --dbpath /db/co2.db
 
   co2log:
