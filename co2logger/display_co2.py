@@ -6,7 +6,7 @@ import time
 
 from database import DB
 
-from lib.i2clcda import lcd_init,lcd_string, lcd_end
+from lib.i2clcda import LCD
 
 
 def create_parser(argv):
@@ -29,33 +29,29 @@ def read_data(dbpath, sql='select * from co2'):
 
 
 def main(args):
-    lcd_init()
+    lcd = LCD()
 
-    LCD_LINE_1 = 0x80 # LCD RAM address for the 1st line
-    LCD_LINE_2 = 0xC0 # LCD RAM address for the 2nd line
+    try:
+        while True:
+            # set sql conditions
+            now = datetime.now()
+            cnd = (now - timedelta(minutes=5)).date()
+            sql = f"select * from co2 where date > '{cnd}'"
 
-    while True:
-        # set sql conditions
-        now = datetime.now()
-        cnd = (now - timedelta(minutes=5)).date()
-        sql = f"select * from co2 where date > '{cnd}'"
+            # read data
+            times, co2 = read_data(args.dbpath, sql)
 
-        # read data
-        times, co2 = read_data(args.dbpath, sql)
+            if args.interval <= 0:
+                break
 
-        if args.interval <= 0:
-            break
-
-        # Display
-        lcd_string("time: %s"%times[-1].strftime("%H:%M:%S"),LCD_LINE_1)
-        lcd_string("CO2: %.1f ppm"%co2[-1],LCD_LINE_2)
-
-        time.sleep(args.interval)
+            # Display
+            lcd.show("time: %s"%times[-1].strftime("%H:%M:%S"),row=0)
+            lcd.show("CO2: %.1f ppm"%co2[-1],row=1)
+            time.sleep(args.interval)
+    finally:
+        lcd.clear()
 
 
 if __name__ == "__main__":
     args = create_parser(sys.argv)
-    try:
-        main(args)
-    finally:
-        lcd_end()
+    main(args)
