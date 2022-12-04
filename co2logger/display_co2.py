@@ -5,8 +5,7 @@ from datetime import datetime, timedelta
 import time
 
 from database import DB
-
-from lib.i2clcda import LCD
+from lib.lcd import LCD
 
 
 def create_parser(argv):
@@ -29,8 +28,13 @@ def read_data(dbpath, sql='select * from co2'):
 
 
 def main(args):
-    lcd = LCD()
+    gpio_display=None
+    # gpio_display=17
 
+    print("init lcd")
+    lcd = LCD(gpio_id=gpio_display)
+
+    print("main")
     try:
         while True:
             # set sql conditions

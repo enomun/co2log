@@ -102,20 +102,6 @@ def main():
 
     time.sleep(3)
 
-class LCD:
-  def __init__(self):
-    self.rows = [LCD_LINE_1, LCD_LINE_2]
-    lcd_init()
-
-  def init(self):
-    lcd_init()
-
-  def show(self, string, row=1):
-    lcd_string(string, self.rows[row])
-    
-  def clear(self):
-    lcd_end()
-
 if __name__ == '__main__':
 
   try:
