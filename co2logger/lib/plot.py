@@ -100,7 +100,7 @@ def create_figure(times, co2, outpath, enlarged=False):
 
     ymin, ymax = ax.get_ylim()
     ymin = min(ymin, 350)
-    ymax = min(max(ymax, 1150), 1500)
+    ymax = min(max(ymax, 1150), 2500)
     ax.set_ylim([ymin, ymax])
 
     if enlarged:
