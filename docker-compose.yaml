@@ -19,6 +19,27 @@ services:
   #   working_dir: /app
   #   command: python plot_co2.py --interval 60 --dbpath /db/co2.db --outpath /image/result.png
 
+  temperature:
+    build: ./co2logger
+    image: co2logger
+    volumes:
+      - type: volume
+        source: nas
+        target: "/data"
+      - type: bind
+        source: "./co2logger"
+        target: "/app"
+    privileged: true
+    environment:
+      TZ: Asia/Tokyo
+      PYTHONUNBUFFERED: 1
+    working_dir: /app
+    devices:
+      - "/dev/i2c-1:/dev/i2c-1"
+      - "/dev/gpiomem:/dev/gpiomem"
+    # command: python log_tmp.py --dbpath /data/dht20
+    command:  sh -c "while true; do sleep 1; done"
+  
   co2display:
     build: ./co2logger
     image: co2logger
@@ -39,26 +60,25 @@ services:
       - "/dev/gpiomem:/dev/gpiomem"
     command: python display_co2.py --interval 5 --dbpath /db/co2.db
 
+  
   co2log:
     build: ./co2logger
     image: co2logger
     volumes:
-      # - type: volume
-      #   source: nas
-      #   target: "/db"
       - ./db:/db
       - type: bind
         source: "./co2logger"
         target: "/app"
-      # - /etc/hosts:/etc/hosts
     environment:
       TZ: Asia/Tokyo
     working_dir: /app
     devices:
       - "/dev/ttyS0:/dev/ttyS0"
     command: python log_co2.py --interval 20 --dbpath /db/co2.db
-    # command:  sh -c "while true; do sleep 1; done"
+    
 
+  
+  
   # web:
   #   build: ./web
   #   image: co2web
