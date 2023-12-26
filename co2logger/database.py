@@ -10,10 +10,8 @@ class DB:
         self.con = sqlite3.connect(dbpath)
         self.cur = self.con.cursor()
 
-        if not pathlib.Path(dbpath).exists():
-            self.cur.execute('''CREATE TABLE co2
-                   (date text, co2 real)''')
-            self.con.commit()
+        self.cur.execute("CREATE TABLE IF NOT EXISTS co2(date text, co2 real)")
+        self.con.commit()
         self.lastdump = time.time()
 
     def write(self, values):
