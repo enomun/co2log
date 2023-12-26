@@ -5,7 +5,7 @@ from datetime import datetime
 import time
 
 from database import DB
-from sensor import CO2Reader
+from sensors import CO2Reader
 
 
 def create_parser(argv):
@@ -42,7 +42,7 @@ def main(args):
             dbcls.commit()
             time.sleep(args.interval)
 
-    except KeyboardInterrupt:
+    finally:
         dbcls.close()
 
 if __name__ == "__main__":
