@@ -29,7 +29,7 @@ def read_data(dbpath, sql='select * from co2'):
 
 def main(args):
     gpio_display=None
-    # gpio_display=17
+    gpio_display=17
 
     print("init lcd")
     lcd = LCD(gpio_id=gpio_display)
