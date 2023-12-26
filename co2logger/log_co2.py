@@ -20,23 +20,30 @@ def create_parser(argv):
 
 
 def main(args):
+    print("start db initialization")
     dbcls = DB(args.dbpath)
+    print("db initialization completed")
+
     co2sensor = CO2Reader(device="/dev/ttyS0", debug=args.debug)
 
+    print("start reading sensor")
     if args.calibrate:
         co2sensor.calibrate()
 
-    while True:
-        co2 = co2sensor.read()
-        if not co2:
-            continue
-        now = str(datetime.now())
-        values = (now, co2)
-        print(values)
-        dbcls.write(values)
-        dbcls.commit()
-        time.sleep(args.interval)
+    try:
+        while True:
+            co2 = co2sensor.read()
+            if not co2:
+                continue
+            now = str(datetime.now())
+            values = (now, co2)
+            print(values)
+            dbcls.write(values)
+            dbcls.commit()
+            time.sleep(args.interval)
 
+    except KeyboardInterrupt:
+        dbcls.close()
 
 if __name__ == "__main__":
     args = create_parser(sys.argv)
