@@ -31,16 +31,19 @@ def read_data(dbpath, sql='select * from co2'):
 
 def read_csv(fp):
     res = None
-    if fp.exists():
-        try:
-            with open(fp,"r") as f:
-                res = f.readlines()
-            res  = res[-1].strip().split(",")
-            temperature, humidity = float(res[0]),float(res[1])
+    
+    try:
+        with open(fp,"r") as f:
+            res = f.readlines()
+    except IOError as e:
+        print(e)
+        res = []
 
-        except IOError as e:
-            print(e)
-            temperature, humidity = 0,0
+    if len(res):
+        res  = res[-1].strip().split(",")
+        temperature, humidity = float(res[0]),float(res[1])
+    else:
+        temperature, humidity = 0,0
     return temperature, humidity
 
 
@@ -66,6 +69,7 @@ def main(args):
     lcd = LCD(gpio_id=gpio_display)
     p_csv = Path(args.fp_csv)
 
+
     interval = timedelta(seconds=args.interval_sec)
     last = datetime.now()-interval
     
@@ -79,7 +83,10 @@ def main(args):
             # read data in every interval[sec]
             if now-last>interval:
                 times, co2 = read_data(args.dbpath, sql)
-                temp, humid = read_csv(p_csv)
+                if p_csv.exists():
+                    temp, humid = read_csv(p_csv)
+                else:
+                    temp,humid = 0,0
                 last = now            
 
             # display
