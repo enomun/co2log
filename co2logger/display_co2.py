@@ -32,11 +32,15 @@ def read_data(dbpath, sql='select * from co2'):
 def read_csv(fp):
     res = None
     if fp.exists():
-        with open(fp,"r") as f:
-            res = f.readlines()
-    res  = res[-1].strip().split(",")
-    temperature, humidity = float(res[0]),float(res[1])
+        try:
+            with open(fp,"r") as f:
+                res = f.readlines()
+            res  = res[-1].strip().split(",")
+            temperature, humidity = float(res[0]),float(res[1])
 
+        except IOError as e:
+            print(e)
+            temperature, humidity = 0,0
     return temperature, humidity
 
 
