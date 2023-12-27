@@ -40,7 +40,7 @@ services:
     command: python log_tmp.py --dbpath /data/dht20
     # command:  sh -c "while true; do sleep 1; done"
   
-  co2display:
+  display:
     build: ./co2logger
     image: co2logger
     volumes:
@@ -64,7 +64,7 @@ services:
     command: python display_co2.py --interval_sec 20 --dbpath /db/co2.db --fp_csv /data/dht20
 
   
-  co2log:
+  co2:
     build: ./co2logger
     image: co2logger
     volumes:
