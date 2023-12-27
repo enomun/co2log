@@ -18,13 +18,15 @@ def create_parser(argv):
 def main(args):
     sensor = DHT20(1)
 
-    tmp, hum = sensor.read()
-    print(f"temperature: {tmp:.1f}, humidity: {hum:.1f}")
+    while True:
+        tmp, hum = sensor.read()
+        # print(f"temperature: {tmp:.1f}, humidity: {hum:.1f}")
 
-    with open(args.dbpath, "w") as f:
-        f.writelines([f"temperature,humidity\n"
-                      ,f"{tmp},{hum}\n"])
-        
+        with open(args.dbpath, "w") as f:
+            f.writelines([f"temperature,humidity\n"
+                        ,f"{tmp},{hum}\n"])
+        time.sleep(20)
+
 if __name__ == "__main__":
     args = create_parser(sys.argv)
     main(args)

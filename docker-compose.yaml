@@ -37,8 +37,8 @@ services:
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
       - "/dev/gpiomem:/dev/gpiomem"
-    # command: python log_tmp.py --dbpath /data/dht20
-    command:  sh -c "while true; do sleep 1; done"
+    command: python log_tmp.py --dbpath /data/dht20
+    # command:  sh -c "while true; do sleep 1; done"
   
   co2display:
     build: ./co2logger
