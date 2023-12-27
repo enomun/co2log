@@ -47,6 +47,9 @@ services:
       - type: bind
         source: "./db"
         target: "/db"
+      - type: volume
+        source: nas
+        target: "/data"
       - type: bind
         source: "./co2logger"
         target: "/app"
@@ -58,7 +61,7 @@ services:
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
       - "/dev/gpiomem:/dev/gpiomem"
-    command: python display_co2.py --interval 5 --dbpath /db/co2.db
+    command: python display_co2.py --interval_sec 20 --dbpath /db/co2.db --fp_csv /data/dht20
 
   
   co2log:

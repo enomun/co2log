@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from pathlib import Path
 import sys
 import argparse
 from datetime import datetime, timedelta
@@ -11,7 +12,8 @@ from lib.lcd import LCD
 def create_parser(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("--dbpath", default="./co2.db")
-    parser.add_argument("--interval", type=int, default=10, help="log interval [sec]")
+    parser.add_argument("--fp_csv", default="./co2.db")
+    parser.add_argument("--interval_sec", type=int, default=10, help="log interval [sec]")
 
     args = parser.parse_args(argv[1:])
     return args
@@ -27,14 +29,35 @@ def read_data(dbpath, sql='select * from co2'):
     return times, co2
 
 
+def read_csv(fp):
+    res = None
+    if fp.exists():
+        with open(fp,"r") as f:
+            res = f.readlines()
+    res  = res[-1].strip().split(",")
+    temperature, humidity = float(res[0]),float(res[1])
+
+    return temperature, humidity
+
+
+def update_display(lcd, time,co2, temp, humid):
+    row0 =f"{time:%H:%M:%S}   {temp:.1f}C"
+    row1= f"{co2[-1]:.1f}ppm  {humid:.1f}%"
+    lcd.show(row0,row=0)
+    lcd.show(row1,row=1)
+
+
 def main(args):
     gpio_display=None
     gpio_display=17
 
     print("init lcd")
     lcd = LCD(gpio_id=gpio_display)
+    p_csv = Path(args.fp_csv)
 
-    print("main")
+    interval = timedelta(seconds=args.interval_sec)
+    last = datetime.now()-interval
+    
     try:
         while True:
             # set sql conditions
@@ -42,16 +65,19 @@ def main(args):
             cnd = (now - timedelta(minutes=5)).date()
             sql = f"select * from co2 where date > '{cnd}'"
 
-            # read data
-            times, co2 = read_data(args.dbpath, sql)
+            # read data in every interval[sec]
+            if now-last>interval:
+                times, co2 = read_data(args.dbpath, sql)
+                temp, humid = read_csv(p_csv)
+                last = now            
 
-            if args.interval <= 0:
+            # display
+            update_display(lcd, now, co2, temp, humid)
+            if args.interval_sec <= 0:
                 break
 
-            # Display
-            lcd.show("time: %s"%times[-1].strftime("%H:%M:%S"),row=0)
-            lcd.show("CO2: %.1f ppm"%co2[-1],row=1)
-            time.sleep(args.interval)
+            time.sleep(1)
+
     finally:
         lcd.clear()
 
