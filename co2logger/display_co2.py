@@ -45,8 +45,15 @@ def read_csv(fp):
 
 
 def update_display(lcd, time,co2, temp, humid):
-    row0 =f"{time:%H:%M:%S}   {temp:.1f}C"
-    row1= f"{co2[-1]:.1f}ppm  {humid:.1f}%"
+    time = f"{time:%H:%M:%S}"
+    co2 = f"{co2[-1]:.1f}ppm"
+    temp = f"{temp:.1f}C" 
+    humid = f"{humid:.1f}%"
+    
+    
+
+    row0 = time.ljust(10) + temp.rjust(6)
+    row1= co2.rjust(9) + humid.rjust(7)
     lcd.show(row0,row=0)
     lcd.show(row1,row=1)
 
