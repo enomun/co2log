@@ -30,7 +30,6 @@ class CO2Reader:
         print("CO2 concentration after calibration: ", self.read_co2())
 
     def read_co2(self):
-        print("Reading sensor information")
         # Send command to
         self.s.write(bytes([0xFF, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79]))
         # Read response

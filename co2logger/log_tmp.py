@@ -19,7 +19,7 @@ def main(args):
     sensor = DHT20(1)
 
     while True:
-        tmp, hum = sensor.read()
+        tmp, hum = sensor.read()\
         # print(f"temperature: {tmp:.1f}, humidity: {hum:.1f}")
 
         with open(args.dbpath, "w") as f:

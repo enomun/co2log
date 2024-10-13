@@ -1,24 +1,6 @@
 version: '3.2'
 
 services:
-  # co2plot:
-  #   build: ./co2logger
-  #   image: co2logger
-  #   volumes:
-  #     - type: bind
-  #       source: "./db"
-  #       target: "/db"
-  #     - type: bind
-  #       source: "./web/images"
-  #       target: "/image"
-  #     - type: bind
-  #       source: "./co2logger"
-  #       target: "/app"
-  #   environment:
-  #     TZ: Asia/Tokyo
-  #   working_dir: /app
-  #   command: python plot_co2.py --interval 60 --dbpath /db/co2.db --outpath /image/result.png
-
   temperature:
     build: ./co2logger
     image: co2logger
@@ -38,15 +20,11 @@ services:
       - "/dev/i2c-1:/dev/i2c-1"
       - "/dev/gpiomem:/dev/gpiomem"
     command: python log_tmp.py --dbpath /data/dht20
-    # command:  sh -c "while true; do sleep 1; done"
   
   display:
     build: ./co2logger
     image: co2logger
     volumes:
-      - type: bind
-        source: "./db"
-        target: "/db"
       - type: volume
         source: nas
         target: "/data"
@@ -61,14 +39,19 @@ services:
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
       - "/dev/gpiomem:/dev/gpiomem"
-    command: python display_co2.py --interval_sec 20 --dbpath /db/co2.db --fp_csv /data/dht20
+    command: python display_co2.py --interval_sec 20 --dbpath /data/co2.latest --fp_csv /data/dht20
 
   
   co2:
     build: ./co2logger
     image: co2logger
     volumes:
-      - ./db:/db
+      # - type: bind
+      #   source: "./db"
+      #   target: "/db"
+      - type: volume
+        source: nas
+        target: "/db"
       - type: bind
         source: "./co2logger"
         target: "/app"
@@ -77,7 +60,7 @@ services:
     working_dir: /app
     devices:
       - "/dev/ttyS0:/dev/ttyS0"
-    command: python log_co2.py --interval 20 --dbpath /db/co2.db
+    command: python log_co2.py --interval 60 --logpath /db/co2.log --out /db/co2.latest
     
 
   
@@ -95,5 +78,5 @@ services:
 
 volumes:
   nas:
-    name: nas-data
+    name: nas-co2
     external: true

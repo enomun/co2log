@@ -5,7 +5,7 @@ import argparse
 from datetime import datetime, timedelta
 import time
 
-from database import DB
+from database import DB, TextDB
 from lib.lcd import LCD
 
 
@@ -19,7 +19,8 @@ def create_parser(argv):
     return args
 
 def read_data(dbpath, sql='select * from co2'):
-    db = DB(dbpath)
+    # db = DB(dbpath)
+    db = TextDB(dbpath)
     df = db.read_sql_in_df(sql)
     db.close()
 
