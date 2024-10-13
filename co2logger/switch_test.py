@@ -30,8 +30,8 @@ class OFF(BaseState):
 
 
 class Context:
-    def __init__(self):
-        self.led = LED(17)
+    def __init__(self, gpio):
+        self.led = LED(gpio)
         self.state = ON(self.led)
 
     def change(self):
@@ -43,16 +43,19 @@ class Context:
 
 def main():
     GPIONUM = 26
-    switch = Switch(GPIONUM)
+    switch = Switch(GPIONUM) # GPIONUMをGNDにつなぐとONとなるスイッチ
 
-    model = Context()
+    model = Context(gpio=17) # GPIOの出力のon/offを切り替える。表示用。
 
     while True:
         if switch.is_on():
             model.change()
+            print("switch is on")
+        else:
+            print("switch is off")
 
         model.run()
-        time.sleep(0.5)
+        time.sleep(5)
 
 if __name__ == "__main__":
     main()
