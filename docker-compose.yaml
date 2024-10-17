@@ -16,11 +16,13 @@ services:
       TZ: Asia/Tokyo
       PYTHONUNBUFFERED: 1
     working_dir: /app
+    restart: always
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
       - "/dev/gpiomem:/dev/gpiomem"
     command: python log_tmp.py --dbpath /data/dht20
-  
+
+
   display:
     build: ./co2logger
     image: co2logger
@@ -58,6 +60,7 @@ services:
     environment:
       TZ: Asia/Tokyo
     working_dir: /app
+    restart: always
     devices:
       - "/dev/ttyS0:/dev/ttyS0"
     command: python log_co2.py --interval 60 --logpath /db/co2.log --out /db/co2.latest

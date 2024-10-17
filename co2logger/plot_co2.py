@@ -5,7 +5,7 @@ import time
 from pathlib import Path
 from datetime import datetime, timedelta
 
-from database import DB
+from database import DB, TextDB
 from lib import plot
 
 
@@ -20,7 +20,7 @@ def create_parser(argv):
 
 
 def read_data(dbpath, sql='select * from co2'):
-    db = DB(dbpath)
+    db = TextDB(dbpath)
     df = db.read_sql_in_df(sql)
     db.close()
 

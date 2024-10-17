@@ -4,9 +4,11 @@ import sys
 import argparse
 from datetime import datetime, timedelta
 import time
+import signal
 
 from database import DB, TextDB
 from lib.lcd import LCD
+
 
 
 def create_parser(argv):
@@ -17,6 +19,10 @@ def create_parser(argv):
 
     args = parser.parse_args(argv[1:])
     return args
+
+def sig_handler(signum, frame, lcd):
+    print(f"called handler: {signum}")
+    sys.exit()
 
 def read_data(dbpath, sql='select * from co2'):
     # db = DB(dbpath)
@@ -58,9 +64,11 @@ def update_display(lcd, time,co2, temp, humid):
 
     row0 = time.ljust(10) + temp.rjust(6)
     row1= co2.rjust(9) + humid.rjust(7)
-    lcd.show(row0,row=0)
-    lcd.show(row1,row=1)
-
+    try:
+        lcd.show(row0,row=0)
+        lcd.show(row1,row=1)
+    except OSError:
+        print("write error")
 
 def main(args):
     gpio_display=None
@@ -74,6 +82,9 @@ def main(args):
     interval = timedelta(seconds=args.interval_sec)
     last = datetime.now()-interval
     
+    signal.signal(signal.SIGTERM, sig_handler)
+
+
     try:
         while True:
             # set sql conditions
