@@ -7,7 +7,7 @@ from . import i2clcda
 
 class LCD:
     def __init__(self, gpio_id=None):
-        self.gpio_id =gpio_id            
+        self.gpio_id =gpio_id  # gpio_idはdisplayの電源スイッチ、現状はnmosをスイッチとしていて、ゲートへの入力に相当
 
         if gpio_id is not None:
             print("using gpio for display: %d"%self.gpio_id)
