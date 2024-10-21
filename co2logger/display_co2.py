@@ -64,11 +64,8 @@ def update_display(lcd, time,co2, temp, humid):
 
     row0 = time.ljust(10) + temp.rjust(6)
     row1= co2.rjust(9) + humid.rjust(7)
-    try:
-        lcd.show(row0,row=0)
-        lcd.show(row1,row=1)
-    except OSError:
-        print("write error")
+    lcd.show(row0,row=0)
+    lcd.show(row1,row=1)
 
 def main(args):
     gpio_display=None
@@ -102,7 +99,13 @@ def main(args):
                 last = now            
 
             # display
-            update_display(lcd, now, co2, temp, humid)
+            try:
+                update_display(lcd, now, co2, temp, humid)
+            except OSError:
+                print("write error")
+                lcd.init()
+                print("reinitialized display")
+
             if args.interval_sec <= 0:
                 break
 
